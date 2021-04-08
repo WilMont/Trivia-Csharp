@@ -10,25 +10,29 @@ namespace Trivia
         {
             var aGame = new Game();
 
-            aGame.Add("Chet");
-            aGame.Add("Pat");
-            aGame.Add("Sue");
+            aGame.InitializePlayers();
 
-            var rand = new Random();
+            aGame.AskDefaultCategory();
 
-            do
+            if (aGame.IsPlayable())
             {
-                aGame.Roll(rand.Next(5) + 1);
 
-                if (rand.Next(9) == 7)
+                var rand = new Random();
+
+                do
                 {
-                    _notAWinner = aGame.WrongAnswer();
-                }
-                else
-                {
-                    _notAWinner = aGame.WasCorrectlyAnswered();
-                }
-            } while (_notAWinner);
+                    aGame.Roll(rand.Next(5) + 1);
+
+                    if (rand.Next(9) == 7)
+                    {
+                        _notAWinner = aGame.WrongAnswer();
+                    }
+                    else
+                    {
+                        _notAWinner = aGame.WasCorrectlyAnswered();
+                    }
+                } while (_notAWinner);
+            }
         }
     }
 }

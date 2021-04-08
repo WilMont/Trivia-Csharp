@@ -17,9 +17,12 @@ namespace Trivia
         private readonly LinkedList<string> _scienceQuestions = new LinkedList<string>();
         private readonly LinkedList<string> _sportsQuestions = new LinkedList<string>();
         private readonly LinkedList<string> _rockQuestions = new LinkedList<string>();
+        private readonly LinkedList<string> _technoQuestions = new LinkedList<string>();
+        private readonly string[] _categories = new string[] { "Rock", "Techno" };
 
         private int _currentPlayer;
         private bool _isGettingOutOfPenaltyBox;
+        private string defaultCategory;
 
         public Game()
         {
@@ -29,6 +32,7 @@ namespace Trivia
                 _scienceQuestions.AddLast(("Science Question " + i));
                 _sportsQuestions.AddLast(("Sports Question " + i));
                 _rockQuestions.AddLast(CreateRockQuestion(i));
+                _technoQuestions.AddLast(CreateTechnoQuestion(i));
             }
         }
 
@@ -37,9 +41,66 @@ namespace Trivia
             return "Rock Question " + index;
         }
 
+        public string CreateTechnoQuestion(int index)
+        {
+            return "Techno Question " + index;
+        }
+
+        public string AskDefaultCategory()
+        {
+            Console.WriteLine("Choose a category for the default category: ");
+            for(int i=0; i< _categories.Length; i++)
+            {
+                Console.WriteLine(i + "-" + _categories[i]);
+            }
+            var choixCategorie = Console.ReadLine();
+            switch (choixCategorie)
+            {
+                case "0":
+                    defaultCategory = _categories[0];
+                    break;
+                case "1":
+                    defaultCategory = _categories[1];
+                    break;
+                default:
+                    Console.WriteLine("Please chose a correct value.");
+                    break;
+            }
+            return defaultCategory;
+        }
+
         public bool IsPlayable()
         {
-            return (HowManyPlayers() >= 2);
+            return (HowManyPlayers() >= 2 && HowManyPlayers() <= 6);
+        }
+
+        public void InitializePlayers()
+        {
+            bool initializing = true;
+
+            while (initializing)
+            {
+                Console.WriteLine("How many players will play ? (2 players minmimum, 6 max) \n Your choice: ");
+                var playersNumber = Console.ReadLine();
+                if (Int16.Parse(playersNumber) < 2)
+                {
+                    Console.WriteLine("Vous n'avez pas assez de joueur pour commencer");
+                }
+                else if (Int16.Parse(playersNumber) > 6)
+                {
+                    Console.WriteLine("Vous avez trop de joueur pour jouer");
+                }
+                else if (Int16.Parse(playersNumber) >= 2 && Int16.Parse(playersNumber) <= 6)
+                {
+                    for (int i = 0; i < Int16.Parse(playersNumber); i++)
+                    {
+                        Console.WriteLine("What's the name of this player ?: ");
+                        var playerName = Console.ReadLine();
+                        this.Add(playerName);
+                    }
+                    initializing = false;
+                }
+            }
         }
 
         public bool Add(string playerName)
@@ -121,6 +182,11 @@ namespace Trivia
                 Console.WriteLine(_rockQuestions.First());
                 _rockQuestions.RemoveFirst();
             }
+            if (CurrentCategory() == "Techno")
+            {
+                Console.WriteLine(_technoQuestions.First());
+                _technoQuestions.RemoveFirst();
+            }
         }
 
         private string CurrentCategory()
@@ -134,7 +200,7 @@ namespace Trivia
             if (_places[_currentPlayer] == 2) return "Sports";
             if (_places[_currentPlayer] == 6) return "Sports";
             if (_places[_currentPlayer] == 10) return "Sports";
-            return "Rock";
+            return defaultCategory;
         }
 
         public bool WasCorrectlyAnswered()
