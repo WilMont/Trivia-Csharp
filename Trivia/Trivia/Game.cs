@@ -83,9 +83,9 @@ namespace Trivia
             {
                 Console.WriteLine("How many gold does a player needs to win the game (6 mini) ?: ");
                 string goldForWinningStr = Console.ReadLine();
-                if (Int16.Parse(goldForWinningStr) >= 6)
+                if (Int32.Parse(goldForWinningStr) >= 6)
                 {
-                    goldForWinning = Int16.Parse(goldForWinningStr);
+                    goldForWinning = Int32.Parse(goldForWinningStr);
                     goldForWinningIsOk = true;
                 }
                 else
@@ -109,18 +109,18 @@ namespace Trivia
             {
                 Console.WriteLine("How many players will play ? (2 players minimum, 6 max) \n Your choice: ");
                 var playersNumber = Console.ReadLine();
-                if (Int16.Parse(playersNumber) < 2)
+                if (Int32.Parse(playersNumber) < 2)
                 {
                     Console.WriteLine("Vous n'avez pas assez de joueur pour commencer");
                 }
-                else if (Int16.Parse(playersNumber) > 6)
+                else if (Int32.Parse(playersNumber) > 6)
                 {
                     Console.WriteLine("Vous avez trop de joueur pour jouer");
                 }
-                else if (Int16.Parse(playersNumber) >= 2 && Int16.Parse(playersNumber) <= 6)
+                else if (Int32.Parse(playersNumber) >= 2 && Int32.Parse(playersNumber) <= 6)
                 {
                     
-                    for (int i = 0; i < Int16.Parse(playersNumber); i++)
+                    for (int i = 0; i < Int32.Parse(playersNumber); i++)
                     {
                         Console.WriteLine("What's the name of this player ?: ");
                         var playerName = Console.ReadLine();
@@ -156,6 +156,7 @@ namespace Trivia
 
             if (_inPenaltyBox[_currentPlayer])
             {
+                Console.WriteLine("Chance : " + Convert.ToDecimal(Convert.ToDecimal(1) / Convert.ToDecimal(_players[_currentPlayer].nbTimeInPrison)));
                 if (rand.Next(1,_players[_currentPlayer].nbTimeInPrison) == 1)
                 {
                     _isGettingOutOfPenaltyBox = true;
@@ -236,28 +237,22 @@ namespace Trivia
                 if (category == "Pop")
                 {
                     _popQuestions.AddLast("Pop Question " + i);
-
-
                 }
                 if (category == "Science")
                 {
                     _scienceQuestions.AddLast(("Science Question " + i));
-
                 }
                 if (category == "Sports")
                 {
                     _sportsQuestions.AddLast(("Sports Question " + i));
-
                 }
                 if (category == "Rock")
                 {
                     _rockQuestions.AddLast(CreateRockQuestion(i));
-
                 }
                 if (category == "Techno")
                 {
                     _technoQuestions.AddLast(CreateTechnoQuestion(i));
-
                 }
             }
         }
@@ -318,14 +313,14 @@ namespace Trivia
 
                     var winner = DidPlayerWin();
                     _currentPlayer++;
-                    if (_currentPlayer == _players.Count) _currentPlayer = 0;
+                    if (_currentPlayer >= _players.Count) _currentPlayer = 0;
 
                     return winner;
                 }
                 else
                 {
                     _currentPlayer++;
-                    if (_currentPlayer == _players.Count) _currentPlayer = 0;
+                    if (_currentPlayer >= _players.Count) _currentPlayer = 0;
                     return true;
                 }
             }
@@ -348,7 +343,7 @@ namespace Trivia
 
                 var winner = DidPlayerWin();
                 _currentPlayer++;
-                if (_currentPlayer == _players.Count) _currentPlayer = 0;
+                if (_currentPlayer >= _players.Count) _currentPlayer = 0;
 
                 return winner;
             }
@@ -374,7 +369,7 @@ namespace Trivia
 
 
             _currentPlayer++;
-            if (_currentPlayer == _players.Count) _currentPlayer = 0;
+            if (_currentPlayer >= _players.Count) _currentPlayer = 0;
             return true;
         }
 
@@ -389,7 +384,7 @@ namespace Trivia
                 {
                     _players[_currentPlayer].Joker--;
                     _currentPlayer++;
-                    if (_currentPlayer == _players.Count) _currentPlayer = 0;
+                    if (_currentPlayer >= _players.Count) _currentPlayer = 0;
                     return true;
                 }
 
@@ -410,7 +405,7 @@ namespace Trivia
                     _players.RemoveAt(_currentPlayer);
 
                     _currentPlayer++;
-                    if (_currentPlayer == _players.Count) _currentPlayer = 0;
+                    if (_currentPlayer >= _players.Count) _currentPlayer = 0;
                     return true;
                 }
             }
