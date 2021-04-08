@@ -22,16 +22,31 @@ namespace Trivia
                 do
                 {
                     aGame.Roll(rand.Next(5) + 1);
-
-                    if (rand.Next(9) == 7)
-                    {
-                        _notAWinner = aGame.WrongAnswer();
+                    if (aGame.IsAlone())
+                        break;
+                    if (!aGame.WantLeave())
+                    { 
+                        if (!aGame.UseJoker())
+                        {
+                            if (rand.Next(9) == 7)
+                            {
+                                _notAWinner = aGame.WrongAnswer();
+                            }
+                            else
+                            {
+                                _notAWinner = aGame.WasCorrectlyAnswered();
+                            }
+                        }
+                        else
+                        {
+                            _notAWinner = true;
+                        }
                     }
                     else
                     {
-                        _notAWinner = aGame.WasCorrectlyAnswered();
+                        _notAWinner = true;
                     }
-                } while (_notAWinner);
+                } while (_notAWinner );
             }
         }
     }

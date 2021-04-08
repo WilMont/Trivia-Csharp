@@ -6,7 +6,7 @@ namespace Trivia
 {
     public class Game
     {
-        private readonly List<string> _players = new List<string>();
+        private List<Player> _players = new List<Player>();
 
         private readonly int[] _places = new int[6];
         private readonly int[] _purses = new int[6];
@@ -105,7 +105,7 @@ namespace Trivia
 
         public bool Add(string playerName)
         {
-            _players.Add(playerName);
+            _players.Add(new Player { Name = playerName, Joker = 1 , IsInGame = true});
             _places[HowManyPlayers()] = 0;
             _purses[HowManyPlayers()] = 0;
             _inPenaltyBox[HowManyPlayers()] = false;
@@ -122,7 +122,7 @@ namespace Trivia
 
         public void Roll(int roll)
         {
-            Console.WriteLine(_players[_currentPlayer] + " is the current player");
+            Console.WriteLine(_players[_currentPlayer].Name + " is the current player");
             Console.WriteLine("They have rolled a " + roll);
 
             if (_inPenaltyBox[_currentPlayer])
@@ -131,11 +131,11 @@ namespace Trivia
                 {
                     _isGettingOutOfPenaltyBox = true;
 
-                    Console.WriteLine(_players[_currentPlayer] + " is getting out of the penalty box");
+                    Console.WriteLine(_players[_currentPlayer].Name + " is getting out of the penalty box");
                     _places[_currentPlayer] = _places[_currentPlayer] + roll;
                     if (_places[_currentPlayer] > 11) _places[_currentPlayer] = _places[_currentPlayer] - 12;
 
-                    Console.WriteLine(_players[_currentPlayer]
+                    Console.WriteLine(_players[_currentPlayer].Name
                             + "'s new location is "
                             + _places[_currentPlayer]);
                     Console.WriteLine("The category is " + CurrentCategory());
@@ -143,7 +143,7 @@ namespace Trivia
                 }
                 else
                 {
-                    Console.WriteLine(_players[_currentPlayer] + " is not getting out of the penalty box");
+                    Console.WriteLine(_players[_currentPlayer].Name + " is not getting out of the penalty box");
                     _isGettingOutOfPenaltyBox = false;
                 }
             }
@@ -152,7 +152,7 @@ namespace Trivia
                 _places[_currentPlayer] = _places[_currentPlayer] + roll;
                 if (_places[_currentPlayer] > 11) _places[_currentPlayer] = _places[_currentPlayer] - 12;
 
-                Console.WriteLine(_players[_currentPlayer]
+                Console.WriteLine(_players[_currentPlayer].Name
                         + "'s new location is "
                         + _places[_currentPlayer]);
                 Console.WriteLine("The category is " + CurrentCategory());
@@ -211,7 +211,7 @@ namespace Trivia
                 {
                     Console.WriteLine("Answer was correct!!!!");
                     _purses[_currentPlayer]++;
-                    Console.WriteLine(_players[_currentPlayer]
+                    Console.WriteLine(_players[_currentPlayer].Name
                             + " now has "
                             + _purses[_currentPlayer]
                             + " Gold Coins.");
@@ -233,7 +233,7 @@ namespace Trivia
             {
                 Console.WriteLine("Answer was corrent!!!!");
                 _purses[_currentPlayer]++;
-                Console.WriteLine(_players[_currentPlayer]
+                Console.WriteLine(_players[_currentPlayer].Name
                         + " now has "
                         + _purses[_currentPlayer]
                         + " Gold Coins.");
@@ -249,7 +249,7 @@ namespace Trivia
         public bool WrongAnswer()
         {
             Console.WriteLine("Question was incorrectly answered");
-            Console.WriteLine(_players[_currentPlayer] + " was sent to the penalty box");
+            Console.WriteLine(_players[_currentPlayer].Name + " was sent to the penalty box");
             _inPenaltyBox[_currentPlayer] = true;
 
             _currentPlayer++;
@@ -257,10 +257,68 @@ namespace Trivia
             return true;
         }
 
+        public bool UseJoker()
+        {
+            if (_players[_currentPlayer].Joker >= 1)
+            {
+                Console.WriteLine("Do you want use your joker ?");
+                Console.WriteLine("Write '0' for No or '1' for Yes");
+                var response = Convert.ToInt32(Console.ReadLine());
+                if(response == 1)
+                {
+                    _players[_currentPlayer].Joker--;
+                    _currentPlayer++;
+                    if (_currentPlayer == _players.Count) _currentPlayer = 0;
+                    return true;
+                }
+                
+            }
+            return false;
+        }
+
+        public bool WantLeave()
+        {
+            if (_players[_currentPlayer].IsInGame)
+            {
+                Console.WriteLine("Do you want to leave the game ?");
+                Console.WriteLine("Write '0' for No or '1' for Yes");
+                var response = Convert.ToInt32(Console.ReadLine());
+                if (response == 1)
+                {
+                    Console.WriteLine("You leave the game !");
+                    _players.RemoveAt(_currentPlayer);
+
+                    _currentPlayer++;
+                    if (_currentPlayer == _players.Count) _currentPlayer = 0;
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        public bool IsAlone()
+        {
+            if(_players.Count == 1)
+            {
+                Console.WriteLine(_players[_currentPlayer].Name + " is the winner because he is the last on the game !");
+                return true;
+
+            }
+            return false;
+        }
+
 
         private bool DidPlayerWin()
         {
             return !(_purses[_currentPlayer] == 6);
+        }
+
+        public class Player
+        {
+            public string Name { get; set; }
+            public int Joker { get; set; }
+            public bool IsInGame { get; set; }
         }
     }
 
