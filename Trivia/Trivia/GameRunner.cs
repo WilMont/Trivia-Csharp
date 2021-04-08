@@ -36,5 +36,3 @@ namespace Trivia
         }
     }
 }
-
-//Test

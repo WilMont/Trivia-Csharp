@@ -80,7 +80,7 @@ namespace Trivia
 
             while (initializing)
             {
-                Console.WriteLine("How many players will play ? (2 players minmimum, 6 max) \n Your choice: ");
+                Console.WriteLine("How many players will play ? (2 players minimum, 6 max) \n Your choice: ");
                 var playersNumber = Console.ReadLine();
                 if (Int16.Parse(playersNumber) < 2)
                 {
