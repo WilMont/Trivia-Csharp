@@ -24,10 +24,10 @@ namespace Trivia
                 do
                 {
                     aGame.Roll(rand.Next(5) + 1);
-                    if (aGame.IsAlone())
+                    if (aGame.IsFinished())
                         break;
                     if (!aGame.WantLeave())
-                    { 
+                    {
                         if (!aGame.UseJoker())
                         {
                             if (rand.Next(9) == 7)
@@ -48,7 +48,11 @@ namespace Trivia
                     {
                         _notAWinner = true;
                     }
+
+
                 } while (_notAWinner );
+
+                aGame.ShowLeaderBoard();
             }
         }
     }

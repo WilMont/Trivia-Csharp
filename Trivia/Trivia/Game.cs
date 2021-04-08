@@ -27,6 +27,9 @@ namespace Trivia
 
         private string penaltyCategoryChoice;
         private bool penaltyCategoryException = false;
+        Random rand = new Random();
+      
+        List<string> leaderBord = new List<string>();
 
         public Game()
         {
@@ -118,6 +121,7 @@ namespace Trivia
                 }
                 else if (Int16.Parse(playersNumber) >= 2 && Int16.Parse(playersNumber) <= 6)
                 {
+                    
                     for (int i = 0; i < Int16.Parse(playersNumber); i++)
                     {
                         Console.WriteLine("What's the name of this player ?: ");
@@ -131,7 +135,7 @@ namespace Trivia
 
         public bool Add(string playerName)
         {
-            _players.Add(new Player { Name = playerName, Joker = 1, IsInGame = true });
+            _players.Add(new Player { Name = playerName, Joker = 1, IsInGame = true, nbTimeInPrison = 0 }) ;
             _places[HowManyPlayers()] = 0;
             _purses[HowManyPlayers()] = 0;
             _inPenaltyBox[HowManyPlayers()] = false;
@@ -148,12 +152,13 @@ namespace Trivia
 
         public void Roll(int roll)
         {
+            Console.WriteLine("######################################");
             Console.WriteLine(_players[_currentPlayer].Name + " is the current player");
             Console.WriteLine("They have rolled a " + roll);
 
             if (_inPenaltyBox[_currentPlayer])
             {
-                if (roll % 2 != 0)
+                if (rand.Next(1,_players[_currentPlayer].nbTimeInPrison) == 1)
                 {
                     _isGettingOutOfPenaltyBox = true;
                     _inPenaltyBox[_currentPlayer] = false;
@@ -209,29 +214,87 @@ namespace Trivia
         {
             if (CurrentCategory() == "Pop")
             {
+                if (_popQuestions.Count == 0)
+                    AddQuestion("Pop");
                 Console.WriteLine(_popQuestions.First());
                 _popQuestions.RemoveFirst();
             }
             if (CurrentCategory() == "Science")
             {
+                if (_scienceQuestions.Count == 0)
+                    AddQuestion("Science");
                 Console.WriteLine(_scienceQuestions.First());
                 _scienceQuestions.RemoveFirst();
             }
             if (CurrentCategory() == "Sports")
             {
+                if (_sportsQuestions.Count == 0)
+                    AddQuestion("Sports");
                 Console.WriteLine(_sportsQuestions.First());
                 _sportsQuestions.RemoveFirst();
             }
             if (CurrentCategory() == "Rock")
             {
+                if (_rockQuestions.Count == 0)
+                    AddQuestion("Rock");
                 Console.WriteLine(_rockQuestions.First());
                 _rockQuestions.RemoveFirst();
             }
             if (CurrentCategory() == "Techno")
             {
+                if (_technoQuestions.Count == 0)
+                    AddQuestion("Techno");
                 Console.WriteLine(_technoQuestions.First());
                 _technoQuestions.RemoveFirst();
             }
+        }
+
+        private void AddQuestion(string category)
+        {
+
+            for (var i = 0; i < 50; i++)
+            {
+                if (category == "Pop")
+                {
+                    _popQuestions.AddLast("Pop Question " + i);
+
+
+                }
+                if (category == "Science")
+                {
+                    _scienceQuestions.AddLast(("Science Question " + i));
+
+                }
+                if (category == "Sports")
+                {
+                    _sportsQuestions.AddLast(("Sports Question " + i));
+
+                }
+                if (category == "Rock")
+                {
+                    _rockQuestions.AddLast(CreateRockQuestion(i));
+
+                }
+                if (category == "Techno")
+                {
+                    _technoQuestions.AddLast(CreateTechnoQuestion(i));
+
+                }
+            }
+        }
+       
+
+        public void ShowLeaderBoard()
+        {
+
+            Console.WriteLine("######################################");
+            Console.WriteLine("The leaderboard is :");
+            int cpt = 1;
+            foreach(string element in leaderBord)
+            {
+                Console.WriteLine(cpt + " - " + element);
+                cpt++;
+            };
         }
 
         private void AskQuestionBeforePenalty(string category)
@@ -284,6 +347,8 @@ namespace Trivia
             {
                 if (_isGettingOutOfPenaltyBox)
                 {
+
+                    Console.WriteLine("------------------------");
                     Console.WriteLine("Answer was correct!!!!");
                     _players[_currentPlayer].GASerie += 1;
                     _purses[_currentPlayer] += _players[_currentPlayer].GASerie;
@@ -307,6 +372,8 @@ namespace Trivia
             }
             else
             {
+                Console.WriteLine("------------------------");
+
                 Console.WriteLine("Answer was correct!!!!");
                 _players[_currentPlayer].GASerie += 1;
                 _purses[_currentPlayer] += _players[_currentPlayer].GASerie;
@@ -317,7 +384,7 @@ namespace Trivia
 
                 if (_purses[_currentPlayer] >= goldForWinning)
                 {
-                    Console.WriteLine(_players[_currentPlayer].Name + " is the winner because he reached " + goldForWinning + " points first !");
+                    Console.WriteLine(_players[_currentPlayer].Name + " finished because he reached " + goldForWinning + " points !");
                 }
 
                 var winner = DidPlayerWin();
@@ -330,6 +397,7 @@ namespace Trivia
 
         public bool WrongAnswer()
         {
+            Console.WriteLine("------------------------");
             Console.WriteLine("Question was incorrectly answered");
 
             bool validCategoryChoice = false;
@@ -355,6 +423,8 @@ namespace Trivia
             Console.WriteLine(_players[_currentPlayer].Name + " was sent to the penalty box");
             _inPenaltyBox[_currentPlayer] = true;
             _players[_currentPlayer].GASerie = 1;
+            _players[_currentPlayer].nbTimeInPrison ++;
+
 
             _currentPlayer++;
             if (_currentPlayer == _players.Count) _currentPlayer = 0;
@@ -401,13 +471,11 @@ namespace Trivia
             return false;
         }
 
-        public bool IsAlone()
+        public bool IsFinished()
         {
-            if (_players.Count == 1)
+            if (leaderBord.Count == 3 || ((_players.Count == 0) && (leaderBord.Count == 2)))
             {
-                Console.WriteLine(_players[_currentPlayer].Name + " is the winner because he is the last on the game !");
                 return true;
-
             }
             return false;
         }
@@ -415,10 +483,16 @@ namespace Trivia
 
         private bool DidPlayerWin()
         {
-            return !(_purses[_currentPlayer] >= goldForWinning);
+            if(_purses[_currentPlayer] >= goldForWinning)
+            {
+                leaderBord.Add(_players[_currentPlayer].Name);
+                _players.RemoveAt(_currentPlayer);
+            }
+            if (leaderBord.Count == 3 || ((_players.Count == 0) && (leaderBord.Count == 2)))
+                return false;
+            else
+                return true;
         }
-
-        //Console.WriteLine(_players[_currentPlayer].Name + " is the winner because he has " + goldForWinning + "points !");
 
         public class Player
         {
@@ -426,6 +500,7 @@ namespace Trivia
             public int Joker { get; set; }
             public bool IsInGame { get; set; }
             public int GASerie { get; set; } // Good Answer Serie
+            public int nbTimeInPrison { get; set; }
         }
     }
 
