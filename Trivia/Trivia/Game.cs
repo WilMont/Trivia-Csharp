@@ -150,6 +150,7 @@ namespace Trivia
 
         public void Roll(int roll)
         {
+            Console.WriteLine("######################################");
             Console.WriteLine(_players[_currentPlayer].Name + " is the current player");
             Console.WriteLine("They have rolled a " + roll);
 
@@ -192,34 +193,80 @@ namespace Trivia
         {
             if (CurrentCategory() == "Pop")
             {
+                if (_popQuestions.Count == 0)
+                    AddQuestion("Pop");
                 Console.WriteLine(_popQuestions.First());
                 _popQuestions.RemoveFirst();
             }
             if (CurrentCategory() == "Science")
             {
+                if (_scienceQuestions.Count == 0)
+                    AddQuestion("Science");
                 Console.WriteLine(_scienceQuestions.First());
                 _scienceQuestions.RemoveFirst();
             }
             if (CurrentCategory() == "Sports")
             {
+                if (_sportsQuestions.Count == 0)
+                    AddQuestion("Sports");
                 Console.WriteLine(_sportsQuestions.First());
                 _sportsQuestions.RemoveFirst();
             }
             if (CurrentCategory() == "Rock")
             {
+                if (_rockQuestions.Count == 0)
+                    AddQuestion("Rock");
                 Console.WriteLine(_rockQuestions.First());
                 _rockQuestions.RemoveFirst();
             }
             if (CurrentCategory() == "Techno")
             {
+                if (_technoQuestions.Count == 0)
+                    AddQuestion("Techno");
                 Console.WriteLine(_technoQuestions.First());
                 _technoQuestions.RemoveFirst();
+            }
+        }
+
+        private void AddQuestion(string category)
+        {
+
+            for (var i = 0; i < 50; i++)
+            {
+                if (category == "Pop")
+                {
+                    _popQuestions.AddLast("Pop Question " + i);
+
+
+                }
+                if (category == "Science")
+                {
+                    _scienceQuestions.AddLast(("Science Question " + i));
+
+                }
+                if (category == "Sports")
+                {
+                    _sportsQuestions.AddLast(("Sports Question " + i));
+
+                }
+                if (category == "Rock")
+                {
+                    _rockQuestions.AddLast(CreateRockQuestion(i));
+
+                }
+                if (category == "Techno")
+                {
+                    _technoQuestions.AddLast(CreateTechnoQuestion(i));
+
+                }
             }
         }
        
 
         public void ShowLeaderBoard()
         {
+
+            Console.WriteLine("######################################");
             Console.WriteLine("The leaderboard is :");
             int cpt = 1;
             foreach(string element in leaderBord)
@@ -259,6 +306,8 @@ namespace Trivia
             {
                 if (_isGettingOutOfPenaltyBox)
                 {
+
+                    Console.WriteLine("------------------------");
                     Console.WriteLine("Answer was correct!!!!");
                     _players[_currentPlayer].GASerie += 1;
                     _purses[_currentPlayer] += _players[_currentPlayer].GASerie;
@@ -282,6 +331,8 @@ namespace Trivia
             }
             else
             {
+                Console.WriteLine("------------------------");
+
                 Console.WriteLine("Answer was correct!!!!");
                 _players[_currentPlayer].GASerie += 1;
                 _purses[_currentPlayer] += _players[_currentPlayer].GASerie;
@@ -305,6 +356,7 @@ namespace Trivia
 
         public bool WrongAnswer()
         {
+            Console.WriteLine("------------------------");
             Console.WriteLine("Question was incorrectly answered");
             //Console.WriteLine("Please choose the next category before going to the penalty box: ");
             //for (int i = 0; i < _categories.Length; i++)
