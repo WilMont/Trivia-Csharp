@@ -19,11 +19,14 @@ namespace Trivia
         private readonly LinkedList<string> _rockQuestions = new LinkedList<string>();
         private readonly LinkedList<string> _technoQuestions = new LinkedList<string>();
         private readonly string[] _defaultCategory = new string[] { "Rock", "Techno" };
-        private readonly string[] _categories = new string[] { "Pop", "Sciences", "Sports", "Rock", "Techno" };
+        private readonly string[] _categories = new string[] { "Pop", "Science", "Sports", "Rock", "Techno" };
 
         private int _currentPlayer;
         private bool _isGettingOutOfPenaltyBox;
         private string defaultCategory;
+
+        private string penaltyCategoryChoice;
+        private bool penaltyCategoryException = false;
 
         public Game()
         {
@@ -161,8 +164,18 @@ namespace Trivia
                     Console.WriteLine(_players[_currentPlayer].Name
                             + "'s new location is "
                             + _places[_currentPlayer]);
-                    Console.WriteLine("The category is " + CurrentCategory());
-                    AskQuestion();
+
+                    if (penaltyCategoryException)
+                    {
+                        Console.WriteLine("The category is " + _categories[Int32.Parse(penaltyCategoryChoice)]);
+                        AskQuestionBeforePenalty(penaltyCategoryChoice);
+                        penaltyCategoryException = false;
+                    }
+                    else
+                    {
+                        Console.WriteLine("The category is " + CurrentCategory());
+                        AskQuestion();
+                    }
                 }
                 else
                 {
@@ -178,8 +191,17 @@ namespace Trivia
                 Console.WriteLine(_players[_currentPlayer].Name
                         + "'s new location is "
                         + _places[_currentPlayer]);
-                Console.WriteLine("The category is " + CurrentCategory());
-                AskQuestion();
+                if (penaltyCategoryException)
+                {
+                    Console.WriteLine("The category is " + _categories[Int32.Parse(penaltyCategoryChoice)]);
+                    AskQuestionBeforePenalty(penaltyCategoryChoice);
+                    penaltyCategoryException = false;
+                }
+                else
+                {
+                    Console.WriteLine("The category is " + CurrentCategory());
+                    AskQuestion();
+                }
             }
         }
 
@@ -212,18 +234,37 @@ namespace Trivia
             }
         }
 
+        private void AskQuestionBeforePenalty(string category)
+        {
+            if (_categories[Int32.Parse(category)] == "Pop")
+            {
+                Console.WriteLine(_popQuestions.First());
+                _popQuestions.RemoveFirst();
+            }
+            if (_categories[Int32.Parse(category)] == "Science")
+            {
+                Console.WriteLine(_scienceQuestions.First());
+                _scienceQuestions.RemoveFirst();
+            }
+            if (_categories[Int32.Parse(category)] == "Sports")
+            {
+                Console.WriteLine(_sportsQuestions.First());
+                _sportsQuestions.RemoveFirst();
+            }
+            if (_categories[Int32.Parse(category)] == "Rock")
+            {
+                Console.WriteLine(_rockQuestions.First());
+                _rockQuestions.RemoveFirst();
+            }
+            if (_categories[Int32.Parse(category)] == "Techno")
+            {
+                Console.WriteLine(_technoQuestions.First());
+                _technoQuestions.RemoveFirst();
+            }
+        }
+
         private string CurrentCategory()
         {
-            //if (_places[_currentPlayer] == 0) return "Pop";
-            //if (_places[_currentPlayer] == 4) return "Pop";
-            //if (_places[_currentPlayer] == 8) return "Pop";
-            //if (_places[_currentPlayer] == 1) return "Science";
-            //if (_places[_currentPlayer] == 5) return "Science";
-            //if (_places[_currentPlayer] == 9) return "Science";
-            //if (_places[_currentPlayer] == 2) return "Sports";
-            //if (_places[_currentPlayer] == 6) return "Sports";
-            //if (_places[_currentPlayer] == 10) return "Sports";
-
             if (_places[_currentPlayer] == 0) return "Pop";
             if (_places[_currentPlayer] == 4) return "Pop";
             if (_places[_currentPlayer] == 8) return "Pop";
@@ -233,6 +274,7 @@ namespace Trivia
             if (_places[_currentPlayer] == 2) return "Sports";
             if (_places[_currentPlayer] == 6) return "Sports";
             if (_places[_currentPlayer] == 10) return "Sports";
+
             return defaultCategory;
         }
 
@@ -289,14 +331,26 @@ namespace Trivia
         public bool WrongAnswer()
         {
             Console.WriteLine("Question was incorrectly answered");
-            //Console.WriteLine("Please choose the next category before going to the penalty box: ");
-            //for (int i = 0; i < _categories.Length; i++)
-            //{
-            //    Console.WriteLine(i + "-" + _categories[i]);
-            //}
-            //Console.WriteLine("Votre choix: ");
-            //var categorieChoice = Console.ReadLine();
-            //CurrentCategory() = _categories[Int16.Parse(categorieChoice)];
+
+            bool validCategoryChoice = false;
+            while (!validCategoryChoice)
+            {
+                Console.WriteLine("Please choose the next category before going to the penalty box: ");
+                for (int i = 0; i < _categories.Length; i++)
+                {
+                    Console.WriteLine(i + "-" + _categories[i]);
+                }
+                Console.WriteLine("Votre choix: ");
+                string tempPenaltyCategoryChoice = Console.ReadLine();
+                if (Int32.Parse(tempPenaltyCategoryChoice) <= _categories.Length)
+                {
+                    penaltyCategoryChoice = tempPenaltyCategoryChoice;
+                    penaltyCategoryException = true;
+                    validCategoryChoice = true;
+                }
+            }
+            Console.WriteLine("La prochaine question portera sur la catégorie " + _categories[Int32.Parse(penaltyCategoryChoice)]);
+            penaltyCategoryException = true;
 
             Console.WriteLine(_players[_currentPlayer].Name + " was sent to the penalty box");
             _inPenaltyBox[_currentPlayer] = true;
