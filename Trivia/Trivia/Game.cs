@@ -25,6 +25,10 @@ namespace Trivia
         private bool _isGettingOutOfPenaltyBox;
         private string defaultCategory;
 
+        Random rand = new Random();
+
+        List<string> leaderBord = new List<string>();
+
         public Game()
         {
             for (var i = 0; i < 50; i++)
@@ -115,6 +119,7 @@ namespace Trivia
                 }
                 else if (Int16.Parse(playersNumber) >= 2 && Int16.Parse(playersNumber) <= 6)
                 {
+                    
                     for (int i = 0; i < Int16.Parse(playersNumber); i++)
                     {
                         Console.WriteLine("What's the name of this player ?: ");
@@ -128,7 +133,7 @@ namespace Trivia
 
         public bool Add(string playerName)
         {
-            _players.Add(new Player { Name = playerName, Joker = 1, IsInGame = true });
+            _players.Add(new Player { Name = playerName, Joker = 1, IsInGame = true, nbTimeInPrison = 0 }) ;
             _places[HowManyPlayers()] = 0;
             _purses[HowManyPlayers()] = 0;
             _inPenaltyBox[HowManyPlayers()] = false;
@@ -150,7 +155,7 @@ namespace Trivia
 
             if (_inPenaltyBox[_currentPlayer])
             {
-                if (roll % 2 != 0)
+                if (rand.Next(1,_players[_currentPlayer].nbTimeInPrison) == 1)
                 {
                     _isGettingOutOfPenaltyBox = true;
                     _inPenaltyBox[_currentPlayer] = false;
@@ -210,6 +215,18 @@ namespace Trivia
                 Console.WriteLine(_technoQuestions.First());
                 _technoQuestions.RemoveFirst();
             }
+        }
+       
+
+        public void ShowLeaderBoard()
+        {
+            Console.WriteLine("The leaderboard is :");
+            int cpt = 1;
+            foreach(string element in leaderBord)
+            {
+                Console.WriteLine(cpt + " - " + element);
+                cpt++;
+            };
         }
 
         private string CurrentCategory()
@@ -275,7 +292,7 @@ namespace Trivia
 
                 if (_purses[_currentPlayer] >= goldForWinning)
                 {
-                    Console.WriteLine(_players[_currentPlayer].Name + " is the winner because he reached " + goldForWinning + " points first !");
+                    Console.WriteLine(_players[_currentPlayer].Name + " finished because he reached " + goldForWinning + " points !");
                 }
 
                 var winner = DidPlayerWin();
@@ -301,6 +318,8 @@ namespace Trivia
             Console.WriteLine(_players[_currentPlayer].Name + " was sent to the penalty box");
             _inPenaltyBox[_currentPlayer] = true;
             _players[_currentPlayer].GASerie = 1;
+            _players[_currentPlayer].nbTimeInPrison ++;
+
 
             _currentPlayer++;
             if (_currentPlayer == _players.Count) _currentPlayer = 0;
@@ -347,13 +366,11 @@ namespace Trivia
             return false;
         }
 
-        public bool IsAlone()
+        public bool IsFinished()
         {
-            if (_players.Count == 1)
+            if (leaderBord.Count == 3 || ((_players.Count == 0) && (leaderBord.Count == 2)))
             {
-                Console.WriteLine(_players[_currentPlayer].Name + " is the winner because he is the last on the game !");
                 return true;
-
             }
             return false;
         }
@@ -361,7 +378,15 @@ namespace Trivia
 
         private bool DidPlayerWin()
         {
-            return !(_purses[_currentPlayer] >= goldForWinning);
+            if(_purses[_currentPlayer] >= goldForWinning)
+            {
+                leaderBord.Add(_players[_currentPlayer].Name);
+                _players.RemoveAt(_currentPlayer);
+            }
+            if (leaderBord.Count == 3 || ((_players.Count == 0) && (leaderBord.Count == 2)))
+                return false;
+            else
+                return true;
         }
 
         //Console.WriteLine(_players[_currentPlayer].Name + " is the winner because he has " + goldForWinning + "points !");
@@ -372,6 +397,7 @@ namespace Trivia
             public int Joker { get; set; }
             public bool IsInGame { get; set; }
             public int GASerie { get; set; } // Good Answer Serie
+            public int nbTimeInPrison { get; set; }
         }
     }
 
