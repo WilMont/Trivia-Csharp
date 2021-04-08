@@ -130,7 +130,7 @@ namespace Trivia
                 if (roll % 2 != 0)
                 {
                     _isGettingOutOfPenaltyBox = true;
-                    _inPenaltyBox[_currentPlayer] = _isGettingOutOfPenaltyBox;
+                    _inPenaltyBox[_currentPlayer] = false;
                     Console.WriteLine(_players[_currentPlayer].Name + " is getting out of the penalty box");
                     _places[_currentPlayer] = _places[_currentPlayer] + roll;
                     if (_places[_currentPlayer] > 11) _places[_currentPlayer] = _places[_currentPlayer] - 12;
