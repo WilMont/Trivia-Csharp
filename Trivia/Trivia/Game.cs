@@ -18,7 +18,8 @@ namespace Trivia
         private readonly LinkedList<string> _sportsQuestions = new LinkedList<string>();
         private readonly LinkedList<string> _rockQuestions = new LinkedList<string>();
         private readonly LinkedList<string> _technoQuestions = new LinkedList<string>();
-        private readonly string[] _categories = new string[] { "Rock", "Techno" };
+        private readonly string[] _defaultCategory = new string[] { "Rock", "Techno" };
+        private readonly string[] _categories = new string[] { "Pop", "Sciences", "Sports", "Rock", "Techno" };
 
         private int _currentPlayer;
         private bool _isGettingOutOfPenaltyBox;
@@ -49,24 +50,46 @@ namespace Trivia
         public string AskDefaultCategory()
         {
             Console.WriteLine("Choose a category for the default category: ");
-            for(int i=0; i< _categories.Length; i++)
+            for (int i = 0; i < _defaultCategory.Length; i++)
             {
-                Console.WriteLine(i + "-" + _categories[i]);
+                Console.WriteLine(i + "-" + _defaultCategory[i]);
             }
             var choixCategorie = Console.ReadLine();
             switch (choixCategorie)
             {
                 case "0":
-                    defaultCategory = _categories[0];
+                    defaultCategory = _defaultCategory[0];
                     break;
                 case "1":
-                    defaultCategory = _categories[1];
+                    defaultCategory = _defaultCategory[1];
                     break;
                 default:
                     Console.WriteLine("Please chose a correct value.");
                     break;
             }
             return defaultCategory;
+        }
+
+        int goldForWinning = 6;
+        public void AskGoldForWinning()
+        {
+            bool goldForWinningIsOk = false;
+
+            while (!goldForWinningIsOk)
+            {
+                Console.WriteLine("How many gold does a player needs to win the game (6 mini) ?: ");
+                string goldForWinningStr = Console.ReadLine();
+                if (Int16.Parse(goldForWinningStr) >= 6)
+                {
+                    goldForWinning = Int16.Parse(goldForWinningStr);
+                    goldForWinningIsOk = true;
+                }
+                else
+                {
+                    Console.WriteLine("The gold amount needed to win must be superior or equal to 6 !");
+                }
+            }
+
         }
 
         public bool IsPlayable()
@@ -105,7 +128,7 @@ namespace Trivia
 
         public bool Add(string playerName)
         {
-            _players.Add(new Player { Name = playerName, Joker = 1 , IsInGame = true});
+            _players.Add(new Player { Name = playerName, Joker = 1, IsInGame = true });
             _places[HowManyPlayers()] = 0;
             _purses[HowManyPlayers()] = 0;
             _inPenaltyBox[HowManyPlayers()] = false;
@@ -191,6 +214,16 @@ namespace Trivia
 
         private string CurrentCategory()
         {
+            //if (_places[_currentPlayer] == 0) return "Pop";
+            //if (_places[_currentPlayer] == 4) return "Pop";
+            //if (_places[_currentPlayer] == 8) return "Pop";
+            //if (_places[_currentPlayer] == 1) return "Science";
+            //if (_places[_currentPlayer] == 5) return "Science";
+            //if (_places[_currentPlayer] == 9) return "Science";
+            //if (_places[_currentPlayer] == 2) return "Sports";
+            //if (_places[_currentPlayer] == 6) return "Sports";
+            //if (_places[_currentPlayer] == 10) return "Sports";
+
             if (_places[_currentPlayer] == 0) return "Pop";
             if (_places[_currentPlayer] == 4) return "Pop";
             if (_places[_currentPlayer] == 8) return "Pop";
@@ -210,7 +243,8 @@ namespace Trivia
                 if (_isGettingOutOfPenaltyBox)
                 {
                     Console.WriteLine("Answer was correct!!!!");
-                    _purses[_currentPlayer]++;
+                    _players[_currentPlayer].GASerie += 1;
+                    _purses[_currentPlayer] += _players[_currentPlayer].GASerie;
                     Console.WriteLine(_players[_currentPlayer].Name
                             + " now has "
                             + _purses[_currentPlayer]
@@ -231,12 +265,18 @@ namespace Trivia
             }
             else
             {
-                Console.WriteLine("Answer was corrent!!!!");
-                _purses[_currentPlayer]++;
+                Console.WriteLine("Answer was correct!!!!");
+                _players[_currentPlayer].GASerie += 1;
+                _purses[_currentPlayer] += _players[_currentPlayer].GASerie;
                 Console.WriteLine(_players[_currentPlayer].Name
                         + " now has "
                         + _purses[_currentPlayer]
                         + " Gold Coins.");
+
+                if (_purses[_currentPlayer] >= goldForWinning)
+                {
+                    Console.WriteLine(_players[_currentPlayer].Name + " is the winner because he reached " + goldForWinning + " points first !");
+                }
 
                 var winner = DidPlayerWin();
                 _currentPlayer++;
@@ -249,8 +289,18 @@ namespace Trivia
         public bool WrongAnswer()
         {
             Console.WriteLine("Question was incorrectly answered");
+            //Console.WriteLine("Please choose the next category before going to the penalty box: ");
+            //for (int i = 0; i < _categories.Length; i++)
+            //{
+            //    Console.WriteLine(i + "-" + _categories[i]);
+            //}
+            //Console.WriteLine("Votre choix: ");
+            //var categorieChoice = Console.ReadLine();
+            //CurrentCategory() = _categories[Int16.Parse(categorieChoice)];
+
             Console.WriteLine(_players[_currentPlayer].Name + " was sent to the penalty box");
             _inPenaltyBox[_currentPlayer] = true;
+            _players[_currentPlayer].GASerie = 1;
 
             _currentPlayer++;
             if (_currentPlayer == _players.Count) _currentPlayer = 0;
@@ -264,14 +314,14 @@ namespace Trivia
                 Console.WriteLine("Do you want use your joker ?");
                 Console.WriteLine("Write '0' for No or '1' for Yes");
                 var response = Convert.ToInt32(Console.ReadLine());
-                if(response == 1)
+                if (response == 1)
                 {
                     _players[_currentPlayer].Joker--;
                     _currentPlayer++;
                     if (_currentPlayer == _players.Count) _currentPlayer = 0;
                     return true;
                 }
-                
+
             }
             return false;
         }
@@ -299,7 +349,7 @@ namespace Trivia
 
         public bool IsAlone()
         {
-            if(_players.Count == 1)
+            if (_players.Count == 1)
             {
                 Console.WriteLine(_players[_currentPlayer].Name + " is the winner because he is the last on the game !");
                 return true;
@@ -311,14 +361,17 @@ namespace Trivia
 
         private bool DidPlayerWin()
         {
-            return !(_purses[_currentPlayer] == 6);
+            return !(_purses[_currentPlayer] >= goldForWinning);
         }
+
+        //Console.WriteLine(_players[_currentPlayer].Name + " is the winner because he has " + goldForWinning + "points !");
 
         public class Player
         {
             public string Name { get; set; }
             public int Joker { get; set; }
             public bool IsInGame { get; set; }
+            public int GASerie { get; set; } // Good Answer Serie
         }
     }
 

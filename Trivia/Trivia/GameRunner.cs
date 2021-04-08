@@ -14,6 +14,8 @@ namespace Trivia
 
             aGame.AskDefaultCategory();
 
+            aGame.AskGoldForWinning();
+
             if (aGame.IsPlayable())
             {
 
